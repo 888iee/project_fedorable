@@ -1,0 +1,156 @@
+---
+- name: Fancify your Linux Client
+  hosts: localhost
+  vars:
+    placeholder: "this is a placeholder"
+    ansible_user: "{{ lookup('env', 'USER') }}"
+
+  tasks:
+    - name: install dependencies
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - curl
+        - wget
+        - git
+        - neovim
+        - stow
+      become: true
+      tags:
+        - deps
+
+    - name: create font directory
+      ansible.builtin.file:
+        path: ~/.local/share/fonts
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0751"
+      tags:
+        - neovim
+
+    - name: download & unzip nerd-fonts
+      ansible.builtin.unarchive:
+        src: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hermit.zip
+        dest: "/home/{{ ansible_user }}/.local/share/fonts"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        remote_src: true
+        exclude:
+          - LICENSE
+          - README.md
+      become: true
+      tags:
+        - neovim
+
+    - name: Update fonts cache
+      ansible.builtin.command:
+        cmd: fc-cache
+      tags:
+        - neovim
+
+    - name: check if any nvim config exists
+      ansible.builtin.stat:
+        path: "/home/{{ ansible_user }}/.config/nvim"
+      register: nvim_config
+      tags:
+        - neovim
+
+    - name: archive nvim config directory
+      community.general.archive:
+        path: "/home/{{ ansible_user }}/.config/nvim"
+        dest: "/home/{{ ansible_user }}/nvim_bkp_{{ ansible_date_time.iso8601 }}.tar.gz"
+      when: nvim_config.stat.exists
+      tags:
+        - neovim
+
+    - name: remove git repo
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.config/nvim/"
+        state: absent
+      when: nvim_config.stat.exists
+      tags:
+        - neovim
+
+    - name: install lazy neovim
+      ansible.builtin.git:
+        repo: https://github.com/LazyVim/starter
+        dest: "/home/{{ ansible_user }}/.config/nvim"
+        version: HEAD
+      register: lazyvim_clone
+      tags:
+        - neovim
+
+    - name: remove git repo
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.config/nvim/.git"
+        state: absent
+      when: lazyvim_clone.changed
+      tags:
+        - neovim
+
+    - name: Install Alacritty
+      ansible.builtin.package:
+        name: alacritty
+        state: present
+      become: true
+      tags:
+        - alacritty
+
+    - name: create if alacritty config dir doesn't exists
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.config/alacritty"
+        state: "directory"
+        mode: "0751"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      tags:
+        - alacritty
+
+    - name: copy alacritty base config 
+      ansible.builtin.copy:
+        src: alacritty.toml
+        dest:  "/home/{{ ansible_user }}/.config/alacritty/alacritty.toml"
+        mode: "0655"
+      tags:
+        - alacritty
+
+    - name: download config files
+      ansible.builtin.git:
+        repo: https://github.com/888iee/dot
+        dest: "/home/{{ ansible_user }}/Documents/dot"
+        version: HEAD
+      tags:
+        - dot
+
+    - name: Enable project Test of the user schlupov
+      community.general.copr:
+        name: solopasha/hyprland
+        state: enabled
+      become: true
+      tags:
+        - hyprland
+
+    - name: install hyprland
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - hyprland
+        - gnome-keyring           # ..
+        - xdg-desktop-portal-kde  # most supported backends
+        - wofi
+        - qt5-wayland
+        - qt6-wayland
+        - hyprpaper
+        - hypridle
+        - hyprlock
+        - hyprpwcenter            #questionable choice
+        - hyprshot
+        - swaync
+        - nautilus
+        - waybar
+      become: true
+      tags:
+        - hyprland
