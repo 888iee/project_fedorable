@@ -110,7 +110,7 @@
 
     - name: copy alacritty base config 
       ansible.builtin.copy:
-        src: alacritty.toml
+        src: files/alacritty.toml
         dest:  "/home/{{ ansible_user }}/.config/alacritty/alacritty.toml"
         mode: "0655"
       tags:
@@ -151,6 +151,9 @@
         - swaync
         - nautilus
         - waybar
+        - hyprpolkitagent
+        - satty
+        - brightnessctl
       become: true
       tags:
         - hyprland
