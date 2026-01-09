@@ -108,14 +108,6 @@
       tags:
         - alacritty
 
-    - name: copy alacritty base config 
-      ansible.builtin.copy:
-        src: files/alacritty.toml
-        dest:  "/home/{{ ansible_user }}/.config/alacritty/alacritty.toml"
-        mode: "0655"
-      tags:
-        - alacritty
-
     - name: download config files
       ansible.builtin.git:
         repo: https://github.com/888iee/dot
@@ -138,22 +130,28 @@
         state: present
       with_items:
         - hyprland
-        - gnome-keyring           # ..
-        - xdg-desktop-portal-kde  # most supported backends
+        - xdg-desktop-portal-kde # most supported backends
         - wofi
         - qt5-wayland
         - qt6-wayland
         - hyprpaper
         - hypridle
         - hyprlock
-        - hyprpwcenter            #questionable choice
+        - hyprpwcenter #questionable choice
         - hyprshot
         - swaync
         - nautilus
         - waybar
         - hyprpolkitagent
         - satty
-        - brightnessctl
       become: true
       tags:
         - hyprland
+
+    - name: install general qol tools
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - brightnessctl
+        - gnome-keyring
