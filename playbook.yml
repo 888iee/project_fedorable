@@ -118,7 +118,7 @@
 
     - name: Enable project Test of the user schlupov
       community.general.copr:
-        name: solopasha/hyprland
+        name: sdegler/hyprland
         state: enabled
       become: true
       tags:
@@ -130,7 +130,7 @@
         state: present
       with_items:
         - hyprland
-        - xdg-desktop-portal-kde # most supported backends
+        - xdg-desktop-portal-hyprland # most supported backends
         - wofi
         - qt5-wayland
         - qt6-wayland
