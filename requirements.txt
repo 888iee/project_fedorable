@@ -13,5 +13,5 @@ pycparser==2.23
 PyYAML==6.0.3
 requests==2.33.0
 resolvelib==1.2.1
-urllib3==2.6.1
+urllib3==2.6.3
 yarg==0.1.10
