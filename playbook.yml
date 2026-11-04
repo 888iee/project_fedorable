@@ -155,3 +155,18 @@
       with_items:
         - brightnessctl
         - gnome-keyring
+
+    - name: install tools for dark gtk theme 
+      ansible.builtin.package:
+        name: gtk-themes-extra
+        state: present
+        use: dnf
+      tags:
+        - dark-theme
+
+    - name: set dark gtk theme
+      ansible.builtin.shell: |
+         gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+         gsettings set org.gnome.desktop.interface color-scheme Adwaita-dark
+      tags:
+        - dark-theme
