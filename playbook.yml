@@ -116,7 +116,7 @@
       tags:
         - dot
 
-    - name: Enable project Test of the user schlupov
+    - name: Enable project Test of the user sdegler
       community.general.copr:
         name: sdegler/hyprland
         state: enabled
