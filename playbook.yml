@@ -29,6 +29,7 @@
         mode: "0751"
       tags:
         - neovim
+        - fonts
 
     - name: download & unzip nerd-fonts
       ansible.builtin.unarchive:
@@ -43,6 +44,7 @@
       become: true
       tags:
         - neovim
+        - fonts
 
     - name: Update fonts cache
       ansible.builtin.command:
