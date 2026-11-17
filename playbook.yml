@@ -4,6 +4,7 @@
   vars:
     placeholder: "this is a placeholder"
     ansible_user: "{{ lookup('env', 'USER') }}"
+    bluetui_version: "0.8.1"                      # https://github.com/pythops/bluetui/releases
 
   tasks:
     - name: install dependencies
@@ -172,3 +173,12 @@
          gsettings set org.gnome.desktop.interface color-scheme Adwaita-dark
       tags:
         - dark-theme
+
+    - name: Download bluetui {{ bluetui_version }}
+      ansible.builtin.get_url:
+        url: "https://github.com/pythops/bluetui/releases/download/v{{ bluetui_version }}/bluetui-{{ ansible_architecture }}-linux-musl"
+        dest: "~/.local/bin/bluetui-{{ bluetui_version }}"
+        mode: "0755"
+      tags:
+        - bluetui
+
